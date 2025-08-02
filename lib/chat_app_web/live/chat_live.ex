@@ -31,11 +31,12 @@ defmodule ChatAppWeb.ChatLive do
 
   @impl true
   def handle_event("send_message", %{"message" => message_params}, socket) do
-    # For now, we'll use a hardcoded user until we add authentication
+    current_user = socket.assigns.current_scope.user
+
     message_params =
       Map.merge(message_params, %{
-        "user_id" => 1,
-        "username" => "Anonymous"
+        "user_id" => current_user.id,
+        "username" => String.split(current_user.email, "@") |> List.first() |> String.capitalize()
       })
 
     case Chat.create_message(message_params) do
