@@ -1,0 +1,81 @@
+<Layouts.app flash={@flash}>
+  <div class="h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-semibold text-gray-900">Chat</h1>
+        <div class="flex items-center space-x-4">
+          <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <span class="text-white text-sm font-medium">A</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+<!-- Main chat area -->
+    <div class="flex-1 flex flex-col min-h-0">
+      <!-- Messages area -->
+      <div class="flex-1 overflow-y-auto px-6 py-4 space-y-4" id="messages-container">
+        <%= if @messages_empty? do %>
+          <div class="flex items-center justify-center h-full">
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                <.icon name="hero-chat-bubble-left-right" class="w-8 h-8 text-gray-400" />
+              </div>
+              <p class="text-gray-500 text-lg">No messages yet</p>
+              <p class="text-gray-400 text-sm mt-1">Start the conversation!</p>
+            </div>
+          </div>
+        <% else %>
+          <div id="messages" phx-update="stream" class="space-y-4">
+            <%= for {id, message} <- @streams.messages do %>
+              <div id={id} class="flex items-start space-x-3">
+                <div class={"w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 #{user_color(message.user_id)}"}>
+                  <span class="text-white text-sm font-medium">
+                    {user_initials(message.username)}
+                  </span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-sm font-medium text-gray-900">{message.username}</span>
+                    <span class="text-xs text-gray-500">
+                      {format_timestamp(message.inserted_at)}
+                    </span>
+                  </div>
+                  <p class="text-sm text-gray-700 mt-1 break-words">{message.content}</p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      
+<!-- Message input area -->
+      <div class="border-t border-gray-200 bg-white px-6 py-4 flex-shrink-0">
+        <.form
+          for={@form}
+          id="message-form"
+          phx-change="validate"
+          phx-submit="send_message"
+          class="flex items-center space-x-4"
+        >
+          <div class="flex-1">
+            <.input
+              field={@form[:content]}
+              type="text"
+              placeholder="Type a message..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white"
+              error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+            />
+          </div>
+          <button
+            type="submit"
+            class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium"
+          >
+            Send
+          </button>
+        </.form>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
