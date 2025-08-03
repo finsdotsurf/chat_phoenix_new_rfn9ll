@@ -5,10 +5,12 @@ defmodule ChatApp.Chat do
 
   import Ecto.Query, warn: false
   alias ChatApp.Repo
+
   alias ChatApp.Chat.Message
+  alias ChatApp.Chat.Room
 
   @doc """
-  Returns the list of messages ordered by insertion time.
+  Returns the list of messages.
 
   ## Examples
 
@@ -17,27 +19,11 @@ defmodule ChatApp.Chat do
 
   """
   def list_messages do
-    Repo.all(from m in Message, order_by: [asc: m.inserted_at])
+    Repo.all(Message)
   end
 
   @doc """
-  Gets a single message.
-
-  Raises `Ecto.NoResultsError` if the Message does not exist.
-
-  ## Examples
-
-      iex> get_message!(123)
-      %Message{}
-
-      iex> get_message!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_message!(id), do: Repo.get!(Message, id)
-
-  @doc """
-  Creates a message and broadcasts it via PubSub.
+  Creates a message.
 
   ## Examples
 
@@ -52,26 +38,37 @@ defmodule ChatApp.Chat do
     %Message{}
     |> Message.changeset(attrs)
     |> Repo.insert()
-    |> broadcast_message()
   end
-
-  defp broadcast_message({:ok, message} = result) do
-    Phoenix.PubSub.broadcast(ChatApp.PubSub, "chat:messages", {:new_message, message})
-    result
-  end
-
-  defp broadcast_message(error), do: error
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking message changes.
-
-  ## Examples
-
-      iex> change_message(message)
-      %Ecto.Changeset{}}
-
+  Returns the list of rooms.
   """
-  def change_message(%Message{} = message, attrs \\ %{}) do
-    Message.changeset(message, attrs)
+  def list_rooms do
+    Repo.all(Room)
+  end
+
+  @doc """
+  Gets a single room by URL.
+  """
+  def get_room_by_url(url) do
+    normalized_url = String.downcase(url)
+    Repo.get_by(Room, url: normalized_url)
+  end
+
+  @doc """
+  Creates a room.
+  """
+  def create_room(attrs \\ %{}) do
+    %Room{}
+    |> Room.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Gets messages for a specific room.
+  """
+  def list_messages_for_room(room_id) do
+    from(m in Message, where: m.room_id == ^room_id, order_by: [asc: m.inserted_at])
+    |> Repo.all()
   end
 end
