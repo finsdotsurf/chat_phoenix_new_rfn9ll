@@ -41,6 +41,19 @@ defmodule ChatApp.Chat do
   end
 
   @doc """
+  Returns an `%Ecto.Changeset{}` for tracking message changes.
+
+  ## Examples
+
+      iex> change_message(message)
+      %Ecto.Changeset{data: %Message{}}
+
+  """
+  def change_message(%Message{} = message, attrs \\ %{}) do
+    Message.changeset(message, attrs)
+  end
+
+  @doc """
   Returns the list of rooms.
   """
   def list_rooms do
