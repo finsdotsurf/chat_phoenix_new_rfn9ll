@@ -50,5 +50,9 @@ defmodule ChatAppWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  # CORS configuration for browser extension
+  plug CORSPlug, origin: ["chrome-extension://*", "moz-extension://*"]
+
   plug ChatAppWeb.Router
 end
