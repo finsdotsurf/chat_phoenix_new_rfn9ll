@@ -22,9 +22,18 @@ defmodule ChatAppWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", ChatAppWeb do
-  #   pipe_through :api
-  # end
+  # API routes for browser extension
+  scope "/api", ChatAppWeb do
+    pipe_through :api
+
+    scope "/auth" do
+      post "/login", ApiController, :login
+      post "/logout", ApiController, :logout
+      get "/me", ApiController, :me
+    end
+  end
+
+  # Other scopes may use custom stacks.
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:chat_app, :dev_routes) do
