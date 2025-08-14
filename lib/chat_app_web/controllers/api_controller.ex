@@ -2,7 +2,6 @@ defmodule ChatAppWeb.ApiController do
   use ChatAppWeb, :controller
 
   alias ChatApp.Accounts
-  alias ChatAppWeb.UserAuth
 
   def login(conn, %{"email" => email, "password" => password}) do
     case Accounts.get_user_by_email_and_password(email, password) do
